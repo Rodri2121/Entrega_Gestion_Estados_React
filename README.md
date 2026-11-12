@@ -87,7 +87,7 @@ Abrir http://localhost:5173 e iniciar sesión con `admin` / `Admin12345`.
 
 Ampliación del mismo frontend (no se reconstruyó el login). Análisis de estados, diseño, pruebas y preguntas de
 análisis en [`DOCUMENTACION_GESTION_ESTADOS.md`](DOCUMENTACION_GESTION_ESTADOS.md) (versión imprimible
-`DOCUMENTACION_GESTION_ESTADOS.pdf`). Las respuestas de la guía en Word están en `Respuestas_Guia_Gestion_Estados.docx`.
+`DOCUMENTACION_GESTION_ESTADOS.pdf`). Las respuestas de la guía en Word están en `Respuestas_Guia_Gestion_Estadosv2.docx`.
 
 La colección de Postman incluye ahora las peticiones 9–17 (POST/PUT, validaciones y permisos por rol); ejecutarla
 completa y en orden.
