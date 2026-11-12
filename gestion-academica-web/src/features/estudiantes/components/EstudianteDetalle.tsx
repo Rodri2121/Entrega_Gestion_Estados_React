@@ -6,10 +6,12 @@ interface Props {
   id: number;
   nombreCarrera: (carreraId: number) => string;
   onCerrar: () => void;
+  /** Solo para ADMIN. */
+  onEditar?: () => void;
 }
 
 /** Actividad 3 – Opción A: detalle del registro con GET /api/v1/estudiantes/{id}. */
-export function EstudianteDetalle({ id, nombreCarrera, onCerrar }: Props) {
+export function EstudianteDetalle({ id, nombreCarrera, onCerrar, onEditar }: Props) {
   const { data, isPending, isError, error, refetch } = useEstudiante(id);
 
   return (
@@ -42,6 +44,12 @@ export function EstudianteDetalle({ id, nombreCarrera, onCerrar }: Props) {
           <dt>Carrera</dt>
           <dd>{nombreCarrera(data.carreraId)}</dd>
         </dl>
+      )}
+
+      {data && onEditar && (
+        <button className="detalle-editar" onClick={onEditar}>
+          Editar
+        </button>
       )}
     </aside>
   );

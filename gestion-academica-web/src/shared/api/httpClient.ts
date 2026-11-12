@@ -47,7 +47,7 @@ export function setUnauthorizedHandler(handler: (() => void) | null): void {
 const MENSAJES_POR_ESTADO: Record<number, string> = {
   400: 'La solicitud contiene datos inválidos.',
   401: 'Tu sesión no es válida o expiró. Inicia sesión nuevamente.',
-  403: 'Tu usuario no tiene permisos para consultar esta información.',
+  403: 'Tu usuario no tiene permisos para realizar esta operación.',
   404: 'El registro solicitado no existe.',
   409: 'La operación entra en conflicto con datos existentes.',
   500: 'Ocurrió un error interno en el servidor.',
@@ -109,4 +109,6 @@ export const httpClient = {
   get: <T>(path: string, signal?: AbortSignal) => request<T>(path, { signal }),
   post: <T>(path: string, body: unknown, options: Omit<RequestOptions, 'method' | 'body'> = {}) =>
     request<T>(path, { ...options, method: 'POST', body }),
+  put: <T>(path: string, body: unknown, options: Omit<RequestOptions, 'method' | 'body'> = {}) =>
+    request<T>(path, { ...options, method: 'PUT', body }),
 };

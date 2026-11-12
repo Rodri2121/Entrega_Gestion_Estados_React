@@ -1,36 +1,38 @@
 import { useEffect, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { setUnauthorizedHandler } from '../shared/api/httpClient';
-import { borrarSesion, guardarSesion, leerSesion, type Sesion } from '../shared/auth/tokenStorage';
+import { sessionStore, useSesion } from '../shared/auth/sessionStore';
+import type { Sesion } from '../shared/auth/tokenStorage';
 import { LoginPage } from '../features/auth/pages/LoginPage';
 import { EstudiantesPage } from '../features/estudiantes/pages/EstudiantesPage';
 
 export function App() {
   const queryClient = useQueryClient();
-  const [sesion, setSesion] = useState<Sesion | null>(() => leerSesion());
+  // Estado de sesión: vive en sessionStore (fuente de verdad: sessionStorage), no en useState ni en la caché.
+  const sesion = useSesion();
+  // Estado local de interfaz: aviso que se muestra en el login.
   const [aviso, setAviso] = useState<string | null>(null);
 
-  // Si la API responde 401 (token expirado o inválido) se cierra la sesión y se vuelve al login.
+  // 401 (token expirado o inválido): se cierra la sesión, se limpia la caché y se vuelve al login.
+  // 403 NO pasa por aquí: el usuario sigue autenticado y cada vista muestra el mensaje de permisos.
   useEffect(() => {
     setUnauthorizedHandler(() => {
-      borrarSesion();
+      sessionStore.cerrar();
       queryClient.clear();
-      setSesion(null);
       setAviso('Tu sesión expiró o el token no es válido. Inicia sesión nuevamente.');
     });
     return () => setUnauthorizedHandler(null);
   }, [queryClient]);
 
   function iniciarSesion(nueva: Sesion) {
-    guardarSesion(nueva);
     setAviso(null);
-    setSesion(nueva);
+    sessionStore.iniciar(nueva);
   }
 
   function cerrarSesion() {
-    borrarSesion();
+    sessionStore.cerrar();
+    // Al cambiar de usuario no deben quedar en caché datos consultados con el token anterior.
     queryClient.clear();
-    setSesion(null);
   }
 
   if (!sesion) return <LoginPage aviso={aviso} onLogin={iniciarSesion} />;
