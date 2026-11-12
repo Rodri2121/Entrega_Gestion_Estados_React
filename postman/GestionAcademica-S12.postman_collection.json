@@ -1,13 +1,38 @@
 {
   "info": {
     "name": "Gestión Académica – Sesión 12",
-    "description": "Pruebas del contrato de la API usado por el frontend React. Ejecutar primero 'Login ADMIN': guarda el token en la variable {{token}}.",
+    "description": "Pruebas del contrato de la API usado por el frontend React. Ejecutar primero 'Login ADMIN': guarda el token en la variable {{token}}. Las peticiones 9-17 (gestión de estados) prueban POST/PUT de estudiantes, sus validaciones y los permisos por rol; ejecutar la colección completa en orden.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
-    { "key": "baseUrl", "value": "http://localhost:9090/api/v1" },
-    { "key": "token", "value": "" },
-    { "key": "tokenEstudiante", "value": "" }
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:9090/api/v1"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "tokenEstudiante",
+      "value": ""
+    },
+    {
+      "key": "tokenDocente",
+      "value": ""
+    },
+    {
+      "key": "carreraId",
+      "value": ""
+    },
+    {
+      "key": "correoNuevo",
+      "value": ""
+    },
+    {
+      "key": "nuevoId",
+      "value": ""
+    }
   ],
   "item": [
     {
@@ -26,69 +51,488 @@
       ],
       "request": {
         "method": "POST",
-        "header": [{ "key": "Content-Type", "value": "application/json" }],
-        "body": { "mode": "raw", "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin12345\"\n}" },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"Admin12345\"\n}"
+        },
         "url": "{{baseUrl}}/auth/login"
       }
     },
     {
       "name": "2. GET estudiantes (con token)",
-      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));", "pm.test('Es un arreglo', () => pm.expect(pm.response.json()).to.be.an('array'));"] } }],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "pm.test('Es un arreglo', () => pm.expect(pm.response.json()).to.be.an('array'));"
+            ]
+          }
+        }
+      ],
       "request": {
         "method": "GET",
-        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
         "url": "{{baseUrl}}/estudiantes"
       }
     },
     {
       "name": "3. GET estudiante por id (detalle)",
-      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));"] } }],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ],
       "request": {
         "method": "GET",
-        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
         "url": "{{baseUrl}}/estudiantes/1"
       }
     },
     {
       "name": "4. GET carreras",
-      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));"] } }],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "if (pm.response.code === 200 && pm.response.json().length) pm.collectionVariables.set('carreraId', pm.response.json()[0].id);"
+            ]
+          }
+        }
+      ],
       "request": {
         "method": "GET",
-        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
         "url": "{{baseUrl}}/carreras"
       }
     },
     {
       "name": "5. GET estudiantes SIN token → 401",
-      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('401 Unauthorized', () => pm.response.to.have.status(401));"] } }],
-      "request": { "method": "GET", "header": [], "url": "{{baseUrl}}/estudiantes" }
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('401 Unauthorized', () => pm.response.to.have.status(401));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/estudiantes"
+      }
     },
     {
       "name": "6. GET estudiante inexistente → 404",
-      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('404 Not Found', () => pm.response.to.have.status(404));"] } }],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('404 Not Found', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ],
       "request": {
         "method": "GET",
-        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
         "url": "{{baseUrl}}/estudiantes/999"
       }
     },
     {
       "name": "7. Login ESTUDIANTE",
-      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('200 OK', () => pm.response.to.have.status(200));", "pm.collectionVariables.set('tokenEstudiante', pm.response.json().accessToken);"] } }],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "pm.collectionVariables.set('tokenEstudiante', pm.response.json().accessToken);"
+            ]
+          }
+        }
+      ],
       "request": {
         "method": "POST",
-        "header": [{ "key": "Content-Type", "value": "application/json" }],
-        "body": { "mode": "raw", "raw": "{\n  \"username\": \"estudiante1\",\n  \"password\": \"Estudiante123\"\n}" },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"estudiante1\",\n  \"password\": \"Estudiante123\"\n}"
+        },
         "url": "{{baseUrl}}/auth/login"
       }
     },
     {
       "name": "8. GET estudiantes con rol ESTUDIANTE → 403",
-      "event": [{ "listen": "test", "script": { "type": "text/javascript", "exec": ["pm.test('403 Forbidden', () => pm.response.to.have.status(403));"] } }],
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('403 Forbidden', () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ],
       "request": {
         "method": "GET",
-        "header": [{ "key": "Authorization", "value": "Bearer {{tokenEstudiante}}" }],
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenEstudiante}}"
+          }
+        ],
         "url": "{{baseUrl}}/estudiantes"
+      }
+    },
+    {
+      "name": "9. POST estudiante válido → 201",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "// correo único para poder ejecutar la colección varias veces",
+              "pm.collectionVariables.set('correoNuevo', 'postman.' + Date.now() + '@uam.edu.ni');"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('201 Created', () => pm.response.to.have.status(201));",
+              "const e = pm.response.json();",
+              "pm.test('Responde carreraId (no carrera)', () => pm.expect(e).to.have.property('carreraId'));",
+              "pm.collectionVariables.set('nuevoId', e.id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/estudiantes",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Estudiante Postman\",\n  \"correo\": \"{{correoNuevo}}\",\n  \"edad\": 20,\n  \"carrera\": {{carreraId}}\n}"
+        }
+      }
+    },
+    {
+      "name": "10. PUT estudiante → 200",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "pm.test('Nombre actualizado', () => pm.expect(pm.response.json().nombre).to.eql('Estudiante Postman Editado'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/estudiantes/{{nuevoId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Estudiante Postman Editado\",\n  \"correo\": \"{{correoNuevo}}\",\n  \"edad\": 21,\n  \"carrera\": {{carreraId}}\n}"
+        }
+      }
+    },
+    {
+      "name": "11. POST campos inválidos → 400 (errors por campo)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+              "pm.test('Trae errors por campo', () => pm.expect(pm.response.json().errors).to.include.keys('nombre', 'correo', 'edad', 'carrera'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/estudiantes",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"\",\n  \"correo\": \"correo-malo\",\n  \"edad\": null,\n  \"carrera\": null\n}"
+        }
+      }
+    },
+    {
+      "name": "12. POST correo duplicado → 409",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('409 Conflict', () => pm.response.to.have.status(409));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/estudiantes",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Duplicado\",\n  \"correo\": \"{{correoNuevo}}\",\n  \"edad\": 20,\n  \"carrera\": {{carreraId}}\n}"
+        }
+      }
+    },
+    {
+      "name": "13. POST menor de edad → 400 (regla de negocio)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 Bad Request', () => pm.response.to.have.status(400));",
+              "pm.test('Mensaje de mayoría de edad', () => pm.expect(pm.response.json().message).to.include('mayor de edad'));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/estudiantes",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Menor Edad\",\n  \"correo\": \"menor.postman@uam.edu.ni\",\n  \"edad\": 16,\n  \"carrera\": {{carreraId}}\n}"
+        }
+      }
+    },
+    {
+      "name": "14. POST carrera inexistente → 404",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('404 Not Found', () => pm.response.to.have.status(404));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/estudiantes",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Sin Carrera\",\n  \"correo\": \"sincarrera.postman@uam.edu.ni\",\n  \"edad\": 20,\n  \"carrera\": 999999\n}"
+        }
+      }
+    },
+    {
+      "name": "15. Login DOCENTE",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200 OK', () => pm.response.to.have.status(200));",
+              "pm.collectionVariables.set('tokenDocente', pm.response.json().accessToken);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"username\": \"docente1\",\n  \"password\": \"Docente123\"\n}"
+        }
+      }
+    },
+    {
+      "name": "16. POST estudiante como DOCENTE → 403",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('403 Forbidden', () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenDocente}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/estudiantes",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Intento Docente\",\n  \"correo\": \"docente.intento@uam.edu.ni\",\n  \"edad\": 20,\n  \"carrera\": {{carreraId}}\n}"
+        }
+      }
+    },
+    {
+      "name": "17. PUT estudiante como DOCENTE → 403",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('403 Forbidden', () => pm.response.to.have.status(403));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenDocente}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/estudiantes/{{nuevoId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nombre\": \"Intento Docente\",\n  \"correo\": \"{{correoNuevo}}\",\n  \"edad\": 20,\n  \"carrera\": {{carreraId}}\n}"
+        }
       }
     }
   ]

@@ -1,7 +1,7 @@
 # Guía práctica · Gestión de estados en React
 
-**Asignatura:** SIS0421 Servicios Web · Unidad III: Consumo de API
-**Caso de estudio:** sincronización del sistema de Gestión Académica (React + Spring Boot)
+**Asignatura:** SIS0421 Servicios Web · Unidad III: Consumo de API  
+**Caso de estudio:** sincronización del sistema de Gestión Académica (React + Spring Boot)  
 **Base:** la entrega S12 (`gestion-academica` + `gestion-academica-web`). El login, el `httpClient`, el
 `QueryClientProvider` y las consultas de lectura ya existían; esta práctica **amplía** ese frontend sin reconstruir el login.
 
@@ -176,6 +176,17 @@ Entorno: API Spring Boot en `:9090` + PostgreSQL 18 (servidor del proyecto en `:
 | 5 | `POST` con carrera 99 | 404 «Carrera con id 99 no encontrada» ✅ |
 | 6 | `PUT /estudiantes/4` (ADMIN) | 200 con los datos nuevos ✅ |
 | 7 | `POST` y `PUT` con token de DOCENTE | 403 «No tiene permisos…» ✅ |
+
+### Colección de Postman
+
+`postman/GestionAcademica-S12.postman_collection.json` incorpora las peticiones **9 a 17**:
+
+- **Operaciones de ADMIN:** POST válido, PUT, campos inválidos, correo duplicado, menor de edad y carrera inexistente.
+- **Pruebas de permisos:** login de DOCENTE, POST como DOCENTE y PUT como DOCENTE (estos dos deben responder 403).
+
+Cada petición tiene aserciones `pm.test`. El correo del alta se genera en el *pre-request* con `Date.now()`, así que la
+colección se puede ejecutar varias veces sin chocar con el 409. La colección completa se ejecutó con Newman:
+**17 peticiones y 22 aserciones, 0 fallos**.
 
 ### En el navegador (prueba automatizada headless sobre la app real)
 

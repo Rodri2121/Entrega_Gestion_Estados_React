@@ -86,7 +86,11 @@ Abrir http://localhost:5173 e iniciar sesión con `admin` / `Admin12345`.
 ## Práctica · Gestión de estados (creación y edición con TanStack Query)
 
 Ampliación del mismo frontend (no se reconstruyó el login). Análisis de estados, diseño, pruebas y preguntas de
-análisis en [`DOCUMENTACION_GESTION_ESTADOS.md`](DOCUMENTACION_GESTION_ESTADOS.md).
+análisis en [`DOCUMENTACION_GESTION_ESTADOS.md`](DOCUMENTACION_GESTION_ESTADOS.md) (versión imprimible
+`DOCUMENTACION_GESTION_ESTADOS.pdf`). Las respuestas de la guía en Word están en `Respuestas_Guia_Gestion_Estados.docx`.
+
+La colección de Postman incluye ahora las peticiones 9–17 (POST/PUT, validaciones y permisos por rol); ejecutarla
+completa y en orden.
 
 > Si `mvn` no está en el PATH, la API también arranca con el wrapper incluido:
 > `cd gestion-academica` y `.\mvnw.cmd spring-boot:run` (con `JWT_SECRET`, `ADMIN_PASSWORD` y, para la opción B,
